@@ -139,4 +139,4 @@ cd ../frontend
 npm run build
 ```
 
-CI also checks migrations on PostgreSQL. Optional live-provider/GPU tests incur external dependencies and are not included in the offline test gate. See `VALIDATION.md` for what was actually run for this delivery.
+CI also checks migrations/backend tests on PostgreSQL, builds the container images, and runs a Playwright browser flow against the Docker stack. The isolated CI fixture is not included in runtime images. Optional live-provider/GPU tests incur external dependencies and are not included in the offline test gate. See `VALIDATION.md` for what was actually run for this delivery.

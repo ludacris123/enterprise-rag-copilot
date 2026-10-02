@@ -72,3 +72,34 @@ jobs:
       - run: cp .env.example .env
       - run: docker compose config --quiet
       - run: docker compose build
+  browser:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: workbench
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: workbench/frontend/package-lock.json
+      - run: cp .env.example .env
+      - run: docker compose up -d --build --wait --wait-timeout 240
+      - run: docker compose exec -T -e CI=true api python - < scripts/seed_ci_user.py
+      - run: npm ci --prefix frontend
+      - run: cd frontend && npx playwright install --with-deps chromium
+      - run: cd frontend && npx playwright test
+      - name: Collect service logs
+        if: failure()
+        run: docker compose logs --tail=100
+      - name: Save browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-evidence
+          path: workbench/frontend/test-results
+          if-no-files-found: ignore
+      - name: Stop test stack
+        if: always()
+        run: docker compose down -v

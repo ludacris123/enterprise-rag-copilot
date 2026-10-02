@@ -13,3 +13,5 @@ artifacts/
 test-artifacts/
 benchmark-output/
 celerybeat-schedule*
+test-results/
+playwright-report/
