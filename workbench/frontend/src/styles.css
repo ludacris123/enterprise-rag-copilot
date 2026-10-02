@@ -9,3 +9,10 @@
 @media(max-width:950px){.two-column{grid-template-columns:minmax(0,1fr)}}
 /* The upload trigger is a button; keep its hidden native file field out of layout. */
 input.hidden[type=file]{display:none}
+@media(max-width:700px){
+ .topbar>div:first-child{min-width:0;flex:1;overflow:hidden;white-space:nowrap;gap:.35rem}
+ .topbar>div:first-child strong{overflow:hidden;text-overflow:ellipsis}
+ .mobile-controls{min-width:0;flex:0 1 48%}
+ .mobile-controls select{min-width:0;flex:1}
+ .mobile-controls button{flex-shrink:0}
+}
