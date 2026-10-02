@@ -1,0 +1,81 @@
+name: ai-engineering-workbench
+x-backend: &backend
+  build: ./backend
+  env_file: .env
+  volumes:
+    - artifacts:/data/artifacts
+  restart: unless-stopped
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    migrate:
+      condition: service_completed_successfully
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: workbench
+      POSTGRES_DB: workbench
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U workbench -d workbench']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    command: [redis-server, --appendonly, 'yes']
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  migrate:
+    build: ./backend
+    env_file: .env
+    command: [alembic, upgrade, head]
+    depends_on:
+      db:
+        condition: service_healthy
+  api:
+    <<: *backend
+    ports:
+      - '127.0.0.1:8000:8000'
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+  worker:
+    <<: *backend
+    command: [celery, -A, app.worker.celery, worker, --loglevel=INFO, --concurrency=2]
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+  scheduler:
+    <<: *backend
+    command: [celery, -A, app.worker.celery, beat, --loglevel=INFO]
+  frontend:
+    build: ./frontend
+    ports:
+      - '127.0.0.1:5173:8080'
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+  mailpit:
+    image: axllent/mailpit:v1.24
+    ports:
+      - '127.0.0.1:8025:8025'
+    restart: unless-stopped
+volumes:
+  postgres:
+  redis:
+  artifacts:
