@@ -7,3 +7,5 @@
 .two-column{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(max-width:1200px){.knowledge-layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:950px){.two-column{grid-template-columns:minmax(0,1fr)}}
+/* The upload trigger is a button; keep its hidden native file field out of layout. */
+input.hidden[type=file]{display:none}
