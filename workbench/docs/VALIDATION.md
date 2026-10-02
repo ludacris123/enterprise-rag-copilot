@@ -14,9 +14,15 @@ This record separates checks performed for this delivery from integrations that 
 
 A local smoke stack used real HTTP, Redis, a Celery worker/scheduler, an SMTP capture server, and SQLite. It exercised persisted asynchronous document ingestion, RAG queries, note approval, evaluations, ML training/prediction, refresh/logout, and verification/reset mail delivery. This is a development integration check; it is not a PostgreSQL load test.
 
-## Not verified in this environment
+## Browser and full-stack checks passed in GitHub Actions
 
-- **Browser visual/interaction QA**: a headless Chromium runtime could not start under this environment's runtime constraints. A Playwright workflow has been added to exercise actual Docker-backed RAG, approvals, evaluations, ML, and responsive layouts in GitHub Actions; its result is tracked separately from local verification.
+Workbench CI passed all five jobs: backend, PostgreSQL, frontend, containers, and browser. The Playwright test ran against the real Docker Compose stack and exercised login, document ingestion, RAG citations, persisted history after reload, agent note approval, evaluations, ML training/prediction, observability, audit history, and logout. All eight application pages passed horizontal-overflow checks at 390, 768, and 1440 pixels.
+
+Evidence: [Workbench CI run](https://github.com/ludacris123/enterprise-rag-copilot/actions/runs/37038236799), tested implementation commit `b4db3e0e236977c19bbbe091f198abe3bbfba90d`.
+
+The repository's separate legacy CI workflow still has failures in the unchanged root reference application. This delivery remains on the feature branch and PR rather than replacing the root application.
+
+## Not verified in this environment
 - **Local PostgreSQL/container runtime**: unavailable locally. The equivalent PostgreSQL/backend and container-build checks passed in GitHub Actions. No production load test was performed.
 - **Live Groq/OpenAI calls**: no user API keys were supplied. Adapter contracts were tested with controlled responses; actual account/model availability and quota are external requirements.
 - **Semantic transformer embeddings**: the baseline hashing adapter was exercised. Optional sentence-transformer model download/runtime was not tested.
