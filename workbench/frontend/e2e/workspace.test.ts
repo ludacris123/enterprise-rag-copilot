@@ -31,7 +31,8 @@ test('authenticated workspace completes RAG, approval, evaluation, and ML flows'
   await page.setViewportSize({width,height:900});
   for(const tab of ['RAG workspace','Knowledge','Agent runs','Evaluations','ML experiments','Model lab','Observability','Workspace settings']){
    await page.getByRole('button',{name:tab,exact:true}).click();await expect(page.getByRole('heading',{name:tab,exact:true})).toBeVisible();
-   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${tab} at ${width}px`).toBeTruthy();
+   const layout=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(el=>el.getBoundingClientRect().right>innerWidth+1).slice(0,10).map(el=>({tag:el.tagName,className:el.className,right:el.getBoundingClientRect().right}))}));
+   expect(layout.scrollWidth<=layout.width,`${tab} at ${width}px: ${JSON.stringify(layout)}`).toBeTruthy();
   }
  }
  expect(errors).toEqual([]);
