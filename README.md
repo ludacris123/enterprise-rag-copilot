@@ -1,5 +1,7 @@
 # Enterprise RAG Copilot
 
+**New: [AI Engineering Workbench](workbench/README.md)** — a complete React/FastAPI application with signup/login/password recovery, Alembic persistence, workspace roles, RAG, agent approvals, evaluations, ML experiments, and quantization tooling. Run the new app from `workbench/`. The original reference copilot below remains available.
+
 A production-oriented, multi-tenant Retrieval-Augmented Generation platform for internal knowledge. Built as a portfolio project for **AI Engineer, Generative AI Engineer, and Python Backend Engineer** roles.
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB) ![FastAPI](https://img.shields.io/badge/FastAPI-Production-009688) ![React](https://img.shields.io/badge/React-TypeScript-61DAFB) ![MCP](https://img.shields.io/badge/MCP-Tools-7C3AED) ![CI](https://img.shields.io/badge/CI-Evals%20%2B%20Tests-success)
