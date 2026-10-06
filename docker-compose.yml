@@ -1,14 +1,36 @@
 services:
   api:
     build: ./backend
-    env_file: .env
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      MODEL_MODE: ${MODEL_MODE:-demo}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CHAT_MODEL: ${CHAT_MODEL:-gpt-4.1-mini}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://copilot:copilot@postgres:5432/copilot}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET: ${JWT_SECRET:-replace-with-a-secret-manager-value}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5173}
     ports: ["8000:8000"]
-    depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_healthy}}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
   worker:
     build: ./backend
     command: celery -A app.worker worker --loglevel=INFO
-    env_file: .env
-    depends_on: [postgres, redis]
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      MODEL_MODE: ${MODEL_MODE:-demo}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CHAT_MODEL: ${CHAT_MODEL:-gpt-4.1-mini}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://copilot:copilot@postgres:5432/copilot}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET: ${JWT_SECRET:-replace-with-a-secret-manager-value}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5173}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
   web:
     build: ./frontend
     ports: ["5173:80"]
